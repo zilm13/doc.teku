@@ -537,14 +537,14 @@ deposit-snapshot-enabled: false
   </TabItem>
 </Tabs>
 
-Enables or disables using a deposit tree snapshot from checkpoint sync or distributed as part of Teku's binary and persisting the tree after finalization. The default is `true`.
+Enables or disables using a bundled deposit contract tree snapshot and persisting the tree after finalization. The default is `true`.
 
 Normally, at sync, Teku requests all deposit logs from the execution layer up to the head. At each startup, Teku
 loads all deposits from the disk and replays them to recreate the merkle tree. Both operations consume peer resources
 and delay node availability on restart. The feature enabled by this option dramatically decreases the time of both
 operations by bundling deposit tree snapshots in the Teku distribution for all major
 networks (Mainnet, Gnosis, Goerli, and Sepolia) and persisting the current tree after finalization. Instead of
-replaying thousands of deposits on startup, Teku loads the bundled tree or a saved one.
+replaying thousands of deposits on startup, Teku loads the bundled tree or a saved one, whichever is the latest.
 
 :::info Security considerations
 If a malicious peer changes the bundled tree, Teku throws `InvalidDepositEventsException` on the next deposit received
@@ -3422,63 +3422,6 @@ You can overwrite the file while Teku is running to update the graffiti.
 
 This option takes precedence over [`--validators-graffiti`](#validators-graffiti).
 
-### `validators-graffiti-client-append-format`
-
-<Tabs>
-  <TabItem value="Syntax" label="Syntax" default>
-
-```bash
---validators-graffiti-client-append-format=<STRING>
-```
-
-  </TabItem>
-  <TabItem value="Example" label="Example" >
-
-```bash
---validators-graffiti-client-append-format=CLIENT_CODES
-```
-
-  </TabItem>
-  <TabItem value="Environment variable" label="Environment variable" >
-
-```bash
-TEKU_VALIDATORS_GRAFFITI_CLIENT_APPEND_FORMAT=CLIENT_CODES
-```
-
-  </TabItem>
-  <TabItem value="Configuration file" label="Configuration file" >
-
-```bash
-validators-graffiti-client-append-format: CLIENT_CODES
-```
-
-  </TabItem>
-</Tabs>
-
-Appends CL and EL clients information with a space to user's graffiti. On
-a separate BN/VC setup should be set on a Beacon Node. This feature helps
-developers and community to analyze client diversity and block anomalies.
-
-Default value is `AUTO`.
-
-Following options are available:
-- `AUTO`: If user's graffiti is empty sets graffiti to reveal
-  consensus and execution clients information using its codes and build commits
-  like "TK508459f2BUbb9ba13c", where "TK" is Teku, followed by build commit,
-  execution layer client 2 characters code, "BU" for Besu in example, and it
-  ends with EL build 4 bytes commit in hexadecimal representation.
-
-  If user's graffiti is set, this option will calculate space left
-  (graffiti size is 32 bytes) and if it's more than 5 characters left, appends
-  either full CL/EL version information or one of its compact forms right up to
-  4 characters (client codes only). So, if your graffiti is
-  "It's my first block!", block will be proposed with the graffiti like
-  "It's my first block TK50BUbb".
-- `CLIENT_CODES`: Appends only CL/EL client codes like "TKBU". It's useful if
-  you are not sure that version information cannot be used to exploit
-  vulnerabilities or just don't want to share any extra information.
-- `DISABLED`: Client information is not appended. If user's graffiti is set it
-  goes as is in a block, otherwise empty graffiti is used.
 
 ### `validator-is-local-slashing-protection-synchronized-enabled`
 
